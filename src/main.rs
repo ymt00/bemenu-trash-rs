@@ -38,9 +38,9 @@ fn main() {
             let icon: &str;
 
             if metadata.expect("Failed to get metadata").is_dir() {
-                icon = "";
+                icon = "\u{f07b}";
             } else {
-                icon = "";
+                icon = "\u{f15b}";
             }
 
             format!(
