@@ -33,7 +33,7 @@ fn main() {
             let path: &Path = Path::new(f.1);
 
             let metadata: Result<fs::Metadata, std::io::Error> =
-                fs::metadata(trash_dir.to_owned() + path.file_name().unwrap().to_str().unwrap());
+                fs::metadata(trash_dir.to_owned() + "/files/" + path.file_name().unwrap().to_str().unwrap());
 
             let icon: &str;
 
