@@ -52,40 +52,46 @@ fn main() {
         })
         .collect::<String>();
 
-    let sel: String = bemenu(items.trim_end_matches("\n"), &BEMENU_ARGS);
-
-    if !sel.is_empty() {
-        let rest_file: &str = sel.split_once("\t").unwrap().1.split_once(" ").unwrap().1;
-
-        let output: Output = Command::new(YAD_BIN)
-            .args([
-                "--name=\"floating 420x180\"",
-                format!(
-                    "--text=Voulez-vous vraiment restaurer <b>{}</b> ?",
-                    rest_file
-                )
-                .as_str(),
-            ])
-            .output()
-            .expect("Command failed");
-
-        if output.status.success() {
-            Command::new(TRASH_RESTORE_BIN)
-                .arg(rest_file)
-                .stdin(Stdio::from(
-                    Command::new(ECHO_BIN)
-                        .arg("0")
-                        .stdout(Stdio::piped())
-                        .spawn()
-                        .unwrap()
-                        .stdout
-                        .unwrap(),
-                ))
-                .stdout(Stdio::null())
-                .spawn()
+    if items.trim() == "" {
+        bemenu("La poubelle est vide", &BEMENU_ARGS);
+        
+    } else {
+        let sel: String = bemenu(items.trim_end_matches("\n"), &BEMENU_ARGS);
+    
+        if !sel.is_empty() {
+            let rest_file: &str = sel.split_once("\t").unwrap().1.split_once(" ").unwrap().1;
+    
+            let output: Output = Command::new(YAD_BIN)
+                .args([
+                    "--name=\"floating 420x180\"",
+                    format!(
+                        "--text=Voulez-vous vraiment restaurer <b>{}</b> ?",
+                        rest_file
+                    )
+                    .as_str(),
+                ])
+                .output()
                 .expect("Command failed");
+    
+            if output.status.success() {
+                Command::new(TRASH_RESTORE_BIN)
+                    .arg(rest_file)
+                    .stdin(Stdio::from(
+                        Command::new(ECHO_BIN)
+                            .arg("0")
+                            .stdout(Stdio::piped())
+                            .spawn()
+                            .unwrap()
+                            .stdout
+                            .unwrap(),
+                    ))
+                    .stdout(Stdio::null())
+                    .spawn()
+                    .expect("Command failed");
+            }
         }
     }
+    
 }
 
 fn get_datetime_path_map() -> BTreeMap<i64, String> {
