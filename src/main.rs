@@ -32,16 +32,15 @@ fn main() {
 
             let path: &Path = Path::new(f.1);
 
-            let metadata: Result<fs::Metadata, std::io::Error> =
-                fs::metadata(trash_dir.to_owned() + "/files/" + path.file_name().unwrap().to_str().unwrap());
+            let metadata: Result<fs::Metadata, std::io::Error> = fs::metadata(
+                trash_dir.to_owned() + "/files/" + path.file_name().unwrap().to_str().unwrap(),
+            );
 
-            let icon: &str;
-
-            if metadata.expect("Failed to get metadata").is_dir() {
-                icon = "\u{f07b}";
+            let icon: &str = if metadata.expect("Failed to get metadata").is_dir() {
+                "\u{f07b}"
             } else {
-                icon = "\u{f15b}";
-            }
+                "\u{f15b}"
+            };
 
             format!(
                 "{}\t{} {}\n",
@@ -54,13 +53,12 @@ fn main() {
 
     if items.trim() == "" {
         bemenu("La poubelle est vide", &BEMENU_ARGS);
-        
     } else {
-        let sel: String = bemenu(items.trim_end_matches("\n"), &BEMENU_ARGS);
-    
+        let sel: String = bemenu(items.trim_end_matches('\n'), &BEMENU_ARGS);
+
         if !sel.is_empty() {
-            let rest_file: &str = sel.split_once("\t").unwrap().1.split_once(" ").unwrap().1;
-    
+            let rest_file: &str = sel.split_once('\t').unwrap().1.split_once(' ').unwrap().1;
+
             let output: Output = Command::new(YAD_BIN)
                 .args([
                     "--name=\"floating 420x180\"",
@@ -72,7 +70,7 @@ fn main() {
                 ])
                 .output()
                 .expect("Command failed");
-    
+
             if output.status.success() {
                 Command::new(TRASH_RESTORE_BIN)
                     .arg(rest_file)
@@ -91,7 +89,6 @@ fn main() {
             }
         }
     }
-    
 }
 
 fn get_datetime_path_map() -> BTreeMap<i64, String> {
