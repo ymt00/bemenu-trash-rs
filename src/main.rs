@@ -27,28 +27,7 @@ fn main() {
 
     let items: String = datetime_path_map
         .iter()
-        .map(|f: (&i64, &String)| {
-            let dt: NaiveDateTime = NaiveDateTime::from_timestamp_opt(f.0.to_owned(), 0).unwrap();
-
-            let path: &Path = Path::new(f.1);
-
-            let metadata: Result<fs::Metadata, std::io::Error> = fs::metadata(
-                trash_dir.to_owned() + "/files/" + path.file_name().unwrap().to_str().unwrap(),
-            );
-
-            let icon: &str = if metadata.expect("Failed to get metadata").is_dir() {
-                "\u{f07b}"
-            } else {
-                "\u{f15b}"
-            };
-
-            format!(
-                "{}\t{} {}\n",
-                dt.format("\u{f133} %a %d %b %Y \u{f017} %H:%M"),
-                icon,
-                f.1
-            )
-        })
+        .map(|f: (&i64, &String)| format_item_name(f, trash_dir))
         .collect::<String>();
 
     if items.trim() == "" {
@@ -89,6 +68,27 @@ fn main() {
             }
         }
     }
+}
+
+fn format_item_name(f: (&i64, &String), trash_dir: &str) -> String {
+    let dt: NaiveDateTime = NaiveDateTime::from_timestamp_opt(f.0.to_owned(), 0).unwrap();
+    let path: &Path = Path::new(f.1);
+    
+    let metadata: Result<fs::Metadata, std::io::Error> = fs::metadata(
+        trash_dir.to_owned() + "/files/" + path.file_name().unwrap().to_str().unwrap(),
+    );
+    
+    let icon: &str = if metadata.expect("Failed to get metadata").is_dir() {
+        "\u{f07b}"
+    } else {
+        "\u{f15b}"
+    };
+    format!(
+        "{}\t{} {}\n",
+        dt.format("\u{f133} %a %d %b %Y \u{f017} %H:%M"),
+        icon,
+        f.1
+    )
 }
 
 fn get_datetime_path_map() -> BTreeMap<i64, String> {
